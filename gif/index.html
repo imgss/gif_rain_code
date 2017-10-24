@@ -38,7 +38,7 @@
                 oFReader.onload = function (oFREvent) {
                     let uploadPreview = document.getElementById("uploadPreview");
                     uploadPreview.src = oFREvent.target.result;
-                    uploadPreview.onload = gifRender;
+                    uploadPreview.onload = setTimeout(gifRender, 500);
                 };
                 function gifRender(){
                     var gif = new GIF({
@@ -47,8 +47,8 @@
                         workerScript:'./gif.worker.js'
                     });
                     document.getElementById('msg').innerHTML = '开始生成gif,稍等';
-                    for(var i=0; i<20; i++){
-                        gif.addFrame(document.getElementById('canvas'), {delay: 100});
+                    for(var i=0; i<40; i++){
+                        gif.addFrame(document.getElementById('canvas'), {delay: 50});
                     }
                     
                     gif.on('finished', function(blob) {
