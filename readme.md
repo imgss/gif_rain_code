@@ -4,8 +4,15 @@
 
 [查看demo](https://imgss.github.io/demo/gif/)
 
+## depends
+
+[gif.js](https://jnordberg.github.io/gif.js/)
+
 ## 生成的gif
 ![截图](https://github.com/imgss/gif_rain_code/blob/master/gif1.gif?raw=true)
 
 ## todo
+
+es5兼容
+
 增加更多的选项
