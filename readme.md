@@ -4,7 +4,7 @@
 
 [查看demo](https://imgss.github.io/demo/gif/)
 
-## depends
+## Thanks
 
 [gif.js](https://jnordberg.github.io/gif.js/)
 
