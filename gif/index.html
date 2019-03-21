@@ -120,14 +120,14 @@
           if (img.src) {
             ctx.drawImage(img, 0, 0, 200, 200 * img.height / img.width);
           }
-          // 画数字
+          // 画数字        
+          ctx.shadowBlur = 10;
+
           for (let col of cells) {
             for (let cell of col) {
-              let color = `rgba(${Pic.fontColor},${(cell.y) / 200})`;
+              let color = `rgba(${Pic.fontColor.join(',')},${(cell.y) / 200})`;
               ctx.fillStyle = color;
               ctx.shadowColor = color;
-              ctx.shadowBlur = 10;
-
               ctx.fillText(cell.text, cell.x, cell.y);
               cell.y = cell.y > pic.height - cell.disappered 
                       ? 0 
@@ -142,6 +142,7 @@
         requestAnimationFrame(draw);
       }
     }
+    Pic.fontColor = [255,255,255];
     // 初始化
     let fileInput = document.getElementById('file');
     let colorInput = document.getElementById('color');
@@ -186,7 +187,7 @@
         gifData = blob;
 
         msgEl.innerHTML = `
-        <a download href=${url}>下载</a>
+        <a download href=${url} style="color:#fff">下载</a>
         <span onclick="save()" style="margin-left:10px;font-size:12px;color:#e5e5e5">下载失败?点这里</span>`;
         // 这里是blob
         document.getElementById('output').src = url;
@@ -195,11 +196,11 @@
 
       let pic = new Pic(200, 200, 20, 10);
       let renderFinished = false;
-      function addFrame(canvas){
-        if(renderFinished) return
+      function addFrame(canvas) {
+        if (renderFinished) return
 
-        if(gif.frames.length < 50){
-          gif.addFrame(canvas, {delay: 20})
+        if (gif.frames.length < 50) {
+          gif.addFrame(canvas, {delay: 20});
         } else {
           gif.render();
           renderFinished = true
@@ -209,7 +210,7 @@
       Pic.draw(pic, addFrame);
     }
     // 使用fileSaver.js保存
-    function save(){
+    function save() {
       saveAs(gifData, 'image/gif');
     }
   </script>
