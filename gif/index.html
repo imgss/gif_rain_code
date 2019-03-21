@@ -57,12 +57,14 @@
   <script>
     // 数字雨
     class Cell {
-      constructor(x, y, speed) {
+      constructor(x, y, speed, color) {
         this.x = x;
         this.y = y + Math.random() * 6;
         this.speed = speed;
+        this.color = color;
         this.text = this.getNumber();
         this.opacity = 1;
+        this.disappered = Math.random() * 30;
       }
       getNumber() {
         // 用到哪些数字
@@ -81,7 +83,7 @@
         this.cells = this.initCells();
       }
       rnd(){
-        return Math.ceil(16 * Math.random())
+        return 1 + Math.ceil(2 * Math.random())
       }
       initCells() {
         let cols = this.cols;
@@ -92,19 +94,17 @@
         for (let i = 0; i < this.cols; i++) {
           let colCells = [], 
               dist = colDist * i, 
-              speed = 2;
-              console.log(speed)
+              speed = this.rnd();
 
           for (let j = 0; j < this.rows; j++) {
-            let cell = new Cell(dist, rowDist * j, speed)
-            colCells.push(cell)
+            let cell = new Cell(dist, rowDist * j, speed);
+            colCells.push(cell);
           }
           cells.push(colCells);
         }
         return cells;
       }
-
-      static draw(pic, speed, cb) {
+      static draw(pic, cb) {
         let cells = pic.cells;
         let canvas = document.querySelector('canvas');
         let ctx = canvas.getContext('2d');
@@ -120,23 +120,23 @@
           // 画数字
           for (let col of cells) {
             for (let cell of col) {
-              let color = `rgba(${Pic.fontColor},${(cell.y) / 200})`
+              let color = `rgba(${Pic.fontColor},${(cell.y) / 200})`;
               ctx.fillStyle = color;
               ctx.shadowColor = color;
               ctx.shadowBlur = 10;
 
               ctx.fillText(cell.text, cell.x, cell.y);
-              cell.y = cell.y > pic.height - Math.random() * 30 
+              cell.y = cell.y > pic.height - cell.disappered 
                       ? 0 
                       : cell.y + cell.speed;
             }
           }
 
           //画完之后保存frame到gif中
-          cb && cb(ctx)
-          requestAnimationFrame(draw)
+          cb && cb(canvas)
+          requestAnimationFrame(draw);
         }
-        requestAnimationFrame(draw)
+        requestAnimationFrame(draw);
       }
     }
     // 初始化
@@ -159,45 +159,48 @@
         oFReader.onload = function (oFREvent) {
           let uploadImg = document.getElementById("uploadPreview");
           uploadImg.src = oFREvent.target.result;
-          uploadImg.onload = setTimeout(gifRender, 500)
+          uploadImg.onload = setTimeout(gifRender, 500);
         };
     }
 
     colorInput.onchange = function () {
       Pic.fontColor = /#(\w{2})(\w{2})(\w{2})/.exec(this.value).slice(1).map(c => parseInt('0x' + c));
-      setTimeout(gifRender, 1000);
+      setTimeout(gifRender, 500);
     }
 
     function gifRender() {
-      var gif = new GIF({
+      let gif = new GIF({
         workers: 2,
         quality: 10,
         workerScript: './gif.worker.js'
       });
       let msgEl = document.getElementById('msg');
-
-      msgEl.innerHTML = '开始生成gif,稍等';
       let canvas = document.getElementById('canvas');
-      for (let i = 0; i < 30; i++) {
-        setTimeout(() => {
-          gif.addFrame(canvas, { delay: 30 });
-        }, 30 * i)
-      }
-      console.log(gif)
+      msgEl.innerHTML = '开始生成gif,稍等';
 
       gif.on('finished', function (blob) {
-        msgEl.innerHTML = '完成';
-        document.getElementById('output').src = URL.createObjectURL(blob);
+        let url = URL.createObjectURL(blob);
+        msgEl.innerHTML = `<a download href=${url}>下载</a>`;
+        // 这里是blob
+        document.getElementById('output').src = url;
+        // 
       });
-      setTimeout(() => {
-        gif.render();
-      }, 2000)
+
+      let pic = new Pic(200, 200, 20, 10);
+      let renderFinished = false;
+      function addFrame(canvas){
+        if(renderFinished) return
+
+        if(gif.frames.length < 50){
+          gif.addFrame(canvas, {delay: 20})
+        } else {
+          gif.render();
+          renderFinished = true
+          addFrame = null
+        }
+      }
+      Pic.draw(pic, addFrame);
     }
-
-    let pic = new Pic(200, 200, 20, 10);
-    Pic.fontColor = '255,255,255'
-    Pic.draw(pic);
-
   </script>
 </body>
 
