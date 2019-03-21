@@ -142,7 +142,7 @@
         requestAnimationFrame(draw);
       }
     }
-    Pic.fontColor = [255,255,255];
+    Pic.fontColor = [255, 255, 255];
     // 初始化
     let fileInput = document.getElementById('file');
     let colorInput = document.getElementById('color');
@@ -171,8 +171,10 @@
       Pic.fontColor = /#(\w{2})(\w{2})(\w{2})/.exec(this.value).slice(1).map(c => parseInt('0x' + c));
       setTimeout(gifRender, 500);
     }
-
+    let isWorking = false;
     function gifRender() {
+      if (isWorking) return;
+      isWorking = true;
       let gif = new GIF({
         workers: 2,
         quality: 10,
@@ -183,6 +185,7 @@
       msgEl.innerHTML = '开始生成gif,稍等';
 
       gif.on('finished', function (blob) {
+        isWorking = false;
         let url = URL.createObjectURL(blob);
         gifData = blob;
 
@@ -197,7 +200,7 @@
       let pic = new Pic(200, 200, 20, 10);
       let renderFinished = false;
       function addFrame(canvas) {
-        if (renderFinished) return
+        if (renderFinished) return;
 
         if (gif.frames.length < 50) {
           gif.addFrame(canvas, {delay: 20});
