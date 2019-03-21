@@ -2,6 +2,8 @@
 
 <head>
   <script src='./gif.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>生成gif数字雨头像</title>
   <style>
     canvas {
@@ -56,6 +58,7 @@
   <img src='' id='output'>
   <script>
     // 数字雨
+    let gifData;
     class Cell {
       constructor(x, y, speed, color) {
         this.x = x;
@@ -149,8 +152,8 @@
 
         let oFile = this.files[0];
         let oFReader = new FileReader();
-        const rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
-        
+        const rFilter = /^(?:image\/bmp|image\/webp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+        console.log(oFile.type)
         if (!rFilter.test(oFile.type)) { 
           alert("You must select a valid image file!"); return; 
         }
@@ -180,7 +183,11 @@
 
       gif.on('finished', function (blob) {
         let url = URL.createObjectURL(blob);
-        msgEl.innerHTML = `<a download href=${url}>下载</a>`;
+        gifData = blob;
+
+        msgEl.innerHTML = `
+        <a download href=${url}>下载</a>
+        <span onclick="save()" style="margin-left:10px;font-size:12px;color:#e5e5e5">下载失败?点这里</span>`;
         // 这里是blob
         document.getElementById('output').src = url;
         // 
@@ -200,6 +207,10 @@
         }
       }
       Pic.draw(pic, addFrame);
+    }
+    // 使用fileSaver.js保存
+    function save(){
+      saveAs(gifData, 'image/gif');
     }
   </script>
 </body>
